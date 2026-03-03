@@ -1,0 +1,16 @@
+{
+  "name": "blockchain-ehr",
+  "version": "1.0.0",
+  "description": "Blockchain-Based Electronic Health Record System",
+  "scripts": {
+    "node:start": "npx hardhat node",
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.22.0"
+  }
+}
