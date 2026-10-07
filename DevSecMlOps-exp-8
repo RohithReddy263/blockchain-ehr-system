@@ -1,0 +1,307 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPe5VObFucnUQz2M/1J5UYk",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/RohithReddy263/blockchain-ehr-system/blob/main/DevSecMlOps-exp-8\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KgWoKNXw-Zup",
+        "outputId": "abb76a7c-ac3c-4071-f66a-e6314ae9a04f"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/134.7 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m134.7/134.7 kB\u001b[0m \u001b[31m4.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/54.9 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m54.9/54.9 kB\u001b[0m \u001b[31m2.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install bandit -q"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile vulnerable.py\n",
+        "\n",
+        "import pickle\n",
+        "import subprocess\n",
+        "import hashlib\n",
+        "\n",
+        "def load_data(file):\n",
+        "    with open(file, \"rb\") as f:\n",
+        "        return pickle.load(f)\n",
+        "\n",
+        "def run_command(command):\n",
+        "    return subprocess.call(command, shell=True)\n",
+        "\n",
+        "def get_hash(data):\n",
+        "    return hashlib.md5(data.encode()).hexdigest()\n",
+        "\n",
+        "PASSWORD = \"admin123\""
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KUcnrL2_-nN3",
+        "outputId": "33a5cb04-cfa7-49ab-f268-8f26a9a64c92"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing vulnerable.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!bandit vulnerable.py"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BRYMubmf-_uo",
+        "outputId": "095317b6-aecb-4e50-9c18-09ded13d513a"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[main]\tINFO\tprofile include tests: None\n",
+            "[main]\tINFO\tprofile exclude tests: None\n",
+            "[main]\tINFO\tcli include tests: None\n",
+            "[main]\tINFO\tcli exclude tests: None\n",
+            "[main]\tINFO\trunning on Python 3.13.16\n",
+            "\u001b[95mRun started:2026-10-07 06:10:31.694456+00:00\u001b[0m\n",
+            "\u001b[95m\n",
+            "Test results:\u001b[0m\n",
+            "\u001b[94m>> Issue: [B403:blacklist] Consider possible security implications associated with pickle module.\n",
+            "   Severity: Low   Confidence: High\n",
+            "   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b403-import-pickle\n",
+            "   Location: ./vulnerable.py:2:0\u001b[0m\n",
+            "1\t\n",
+            "2\timport pickle\n",
+            "3\timport subprocess\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[94m>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.\n",
+            "   Severity: Low   Confidence: High\n",
+            "   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess\n",
+            "   Location: ./vulnerable.py:3:0\u001b[0m\n",
+            "2\timport pickle\n",
+            "3\timport subprocess\n",
+            "4\timport hashlib\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[93m>> Issue: [B301:blacklist] Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.\n",
+            "   Severity: Medium   Confidence: High\n",
+            "   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle\n",
+            "   Location: ./vulnerable.py:8:15\u001b[0m\n",
+            "7\t    with open(file, \"rb\") as f:\n",
+            "8\t        return pickle.load(f)\n",
+            "9\t\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[91m>> Issue: [B602:subprocess_popen_with_shell_equals_true] subprocess call with shell=True identified, security issue.\n",
+            "   Severity: High   Confidence: High\n",
+            "   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html\n",
+            "   Location: ./vulnerable.py:11:11\u001b[0m\n",
+            "10\tdef run_command(command):\n",
+            "11\t    return subprocess.call(command, shell=True)\n",
+            "12\t\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[91m>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False\n",
+            "   Severity: High   Confidence: High\n",
+            "   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html\n",
+            "   Location: ./vulnerable.py:14:11\u001b[0m\n",
+            "13\tdef get_hash(data):\n",
+            "14\t    return hashlib.md5(data.encode()).hexdigest()\n",
+            "15\t\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[94m>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'admin123'\n",
+            "   Severity: Low   Confidence: Medium\n",
+            "   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html\n",
+            "   Location: ./vulnerable.py:16:11\u001b[0m\n",
+            "15\t\n",
+            "16\tPASSWORD = \"admin123\"\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[95m\n",
+            "Code scanned:\u001b[0m\n",
+            "\tTotal lines of code: 11\n",
+            "\tTotal lines skipped (#nosec): 0\n",
+            "\u001b[95m\n",
+            "Run metrics:\u001b[0m\n",
+            "\tTotal issues (by severity):\n",
+            "\t\tUndefined: 0\n",
+            "\t\tLow: 3\n",
+            "\t\tMedium: 1\n",
+            "\t\tHigh: 2\n",
+            "\tTotal issues (by confidence):\n",
+            "\t\tUndefined: 0\n",
+            "\t\tLow: 0\n",
+            "\t\tMedium: 1\n",
+            "\t\tHigh: 5\n",
+            "\u001b[95mFiles skipped (0):\u001b[0m\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile fixed.py\n",
+        "\n",
+        "import json\n",
+        "import subprocess\n",
+        "import hashlib\n",
+        "import os\n",
+        "\n",
+        "def load_data(file):\n",
+        "    with open(file, \"r\") as f:\n",
+        "        return json.load(f)\n",
+        "\n",
+        "def run_command(command):\n",
+        "    return subprocess.call(command, shell=False)\n",
+        "\n",
+        "def get_hash(data):\n",
+        "    return hashlib.sha256(data.encode()).hexdigest()\n",
+        "\n",
+        "PASSWORD = os.environ.get(\"PASSWORD\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "x7EN8qeD_Ki5",
+        "outputId": "307e7e75-88a6-4905-9156-d08e255a0f6f"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing fixed.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!bandit fixed.py"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Nbn-t_j9_QVj",
+        "outputId": "aa1da833-bce8-48ef-d8cd-e6cdac2b05e1"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[main]\tINFO\tprofile include tests: None\n",
+            "[main]\tINFO\tprofile exclude tests: None\n",
+            "[main]\tINFO\tcli include tests: None\n",
+            "[main]\tINFO\tcli exclude tests: None\n",
+            "[main]\tINFO\trunning on Python 3.13.16\n",
+            "\u001b[95mRun started:2026-10-07 06:11:33.531173+00:00\u001b[0m\n",
+            "\u001b[95m\n",
+            "Test results:\u001b[0m\n",
+            "\u001b[94m>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.\n",
+            "   Severity: Low   Confidence: High\n",
+            "   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess\n",
+            "   Location: ./fixed.py:3:0\u001b[0m\n",
+            "2\timport json\n",
+            "3\timport subprocess\n",
+            "4\timport hashlib\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[94m>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.\n",
+            "   Severity: Low   Confidence: High\n",
+            "   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)\n",
+            "   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html\n",
+            "   Location: ./fixed.py:12:11\u001b[0m\n",
+            "11\tdef run_command(command):\n",
+            "12\t    return subprocess.call(command, shell=False)\n",
+            "13\t\n",
+            "\n",
+            "--------------------------------------------------\n",
+            "\u001b[95m\n",
+            "Code scanned:\u001b[0m\n",
+            "\tTotal lines of code: 12\n",
+            "\tTotal lines skipped (#nosec): 0\n",
+            "\u001b[95m\n",
+            "Run metrics:\u001b[0m\n",
+            "\tTotal issues (by severity):\n",
+            "\t\tUndefined: 0\n",
+            "\t\tLow: 2\n",
+            "\t\tMedium: 0\n",
+            "\t\tHigh: 0\n",
+            "\tTotal issues (by confidence):\n",
+            "\t\tUndefined: 0\n",
+            "\t\tLow: 0\n",
+            "\t\tMedium: 0\n",
+            "\t\tHigh: 2\n",
+            "\u001b[95mFiles skipped (0):\u001b[0m\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
