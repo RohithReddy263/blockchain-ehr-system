@@ -1,0 +1,195 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMqoAHH+QskkmVd0VnxeWRz",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/RohithReddy263/blockchain-ehr-system/blob/main/DevSecMlOps%20Exp-6\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "VgIo31i99Ovx",
+        "outputId": "5c6db2c4-829b-48f6-8959-03338924e2d6"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "=== ML Pipeline RBAC ===\n",
+            "[ALLOW] admin -> deploy\n",
+            "[ALLOW] data_scientist -> train\n",
+            "[DENY] viewer -> train\n",
+            "[ALLOW] ml_engineer -> deploy\n"
+          ]
+        }
+      ],
+      "source": [
+        "from datetime import datetime\n",
+        "\n",
+        "# Roles and permissions\n",
+        "ROLES = {\n",
+        "    \"data_engineer\": {\"extract\", \"transform\"},\n",
+        "    \"data_scientist\": {\"train\", \"evaluate\"},\n",
+        "    \"ml_engineer\": {\"train\", \"deploy\"},\n",
+        "    \"admin\": {\"extract\", \"transform\", \"train\", \"evaluate\", \"deploy\"},\n",
+        "    \"viewer\": {\"view\"}\n",
+        "}\n",
+        "\n",
+        "# Audit log\n",
+        "audit_log = []\n",
+        "\n",
+        "\n",
+        "def check_access(role, action):\n",
+        "    if action in ROLES.get(role, set()):\n",
+        "        result = \"ALLOW\"\n",
+        "        print(f\"[ALLOW] {role} -> {action}\")\n",
+        "    else:\n",
+        "        result = \"DENY\"\n",
+        "        print(f\"[DENY] {role} -> {action}\")\n",
+        "\n",
+        "    audit_log.append({\n",
+        "        \"time\": datetime.now().strftime(\"%H:%M:%S\"),\n",
+        "        \"role\": role,\n",
+        "        \"action\": action,\n",
+        "        \"result\": result\n",
+        "    })\n",
+        "\n",
+        "\n",
+        "print(\"=== ML Pipeline RBAC ===\")\n",
+        "\n",
+        "check_access(\"admin\", \"deploy\")\n",
+        "check_access(\"data_scientist\", \"train\")\n",
+        "check_access(\"viewer\", \"train\")\n",
+        "check_access(\"ml_engineer\", \"deploy\")"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(\"=== Audit Log ===\")\n",
+        "\n",
+        "for log in audit_log:\n",
+        "    print(\n",
+        "        log[\"time\"],\n",
+        "        \"|\", log[\"role\"],\n",
+        "        \"|\", log[\"action\"],\n",
+        "        \"|\", log[\"result\"]\n",
+        "    )"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "WtmfJwpm9nJc",
+        "outputId": "bb09b936-7131-4c32-b390-604ee1eade2f"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "=== Audit Log ===\n",
+            "06:03:50 | admin | deploy | ALLOW\n",
+            "06:03:50 | data_scientist | train | ALLOW\n",
+            "06:03:50 | viewer | train | DENY\n",
+            "06:03:50 | ml_engineer | deploy | ALLOW\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(\"=== Security Tests ===\")\n",
+        "\n",
+        "check_access(\"admin\", \"train\")\n",
+        "check_access(\"viewer\", \"deploy\")\n",
+        "check_access(\"data_engineer\", \"extract\")\n",
+        "check_access(\"data_engineer\", \"deploy\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-c9Xz7tb91sw",
+        "outputId": "cc763850-4760-455e-cbee-694155aaf039"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "=== Security Tests ===\n",
+            "[ALLOW] admin -> train\n",
+            "[DENY] viewer -> deploy\n",
+            "[ALLOW] data_engineer -> extract\n",
+            "[DENY] data_engineer -> deploy\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(\"\\n=== VERIFICATION ===\")\n",
+        "\n",
+        "for log in audit_log:\n",
+        "    print(log)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "94y_BGXo-JbH",
+        "outputId": "1a08439c-3d05-4774-caa6-3c5c273ce949"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\n",
+            "=== VERIFICATION ===\n",
+            "{'time': '06:03:50', 'role': 'admin', 'action': 'deploy', 'result': 'ALLOW'}\n",
+            "{'time': '06:03:50', 'role': 'data_scientist', 'action': 'train', 'result': 'ALLOW'}\n",
+            "{'time': '06:03:50', 'role': 'viewer', 'action': 'train', 'result': 'DENY'}\n",
+            "{'time': '06:03:50', 'role': 'ml_engineer', 'action': 'deploy', 'result': 'ALLOW'}\n",
+            "{'time': '06:05:27', 'role': 'admin', 'action': 'train', 'result': 'ALLOW'}\n",
+            "{'time': '06:05:27', 'role': 'viewer', 'action': 'deploy', 'result': 'DENY'}\n",
+            "{'time': '06:05:27', 'role': 'data_engineer', 'action': 'extract', 'result': 'ALLOW'}\n",
+            "{'time': '06:05:27', 'role': 'data_engineer', 'action': 'deploy', 'result': 'DENY'}\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
